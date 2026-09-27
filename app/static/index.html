@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <title>PGN Extract GUI</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#workspace">Skip to workspace</a>
+
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">♞</div>
+        <div>
+          <h1>PGN Extract GUI</h1>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="true" aria-label="Switch to light theme">
+          <span id="theme-toggle-icon" class="theme-toggle-icon" aria-hidden="true">☀</span>
+          <span id="theme-toggle-label">Light theme</span>
+        </button>
+      </div>
+    </header>
+
+    <main id="workspace" class="workspace">
+      <section id="app-notice" class="notice hidden" role="status" aria-live="polite"></section>
+
+      <form id="job-form" novalidate>
+        <div class="form-toolbar">
+          <button id="reset-form" class="secondary" type="button">Reset to Defaults</button>
+        </div>
+        <div class="layout">
+          <div class="configuration-column">
+            <section class="panel source-panel" aria-labelledby="sources-heading">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">1. Input</p>
+                  <h2 id="sources-heading">PGN files</h2>
+                </div>
+                <div class="source-actions">
+                  <button id="count-games" class="secondary" type="button" disabled>Count games</button>
+                  <span id="source-count" class="count-badge" aria-live="polite">0 files</span>
+                </div>
+              </div>
+              <p class="help">Choose one or more PGN files. When more than one file is selected, they are merged in the selected order.</p>
+
+              <div class="source-entry">
+                <label class="sr-only" for="source-path">PGN file path</label>
+                <input id="source-path" type="text" autocomplete="off" placeholder="C:\\Games\\tournament.pgn" />
+                <button id="add-source" class="secondary" type="button">Add path</button>
+                <button id="browse-sources" class="secondary icon-button" type="button" title="Choose PGN files" aria-label="Choose PGN files">Browse…</button>
+              </div>
+              <p class="field-note">You can paste a path, or use Browse when the desktop bridge is available.</p>
+
+              <details id="source-list-details" class="source-list-details" hidden>
+                <summary>Selected files</summary>
+                <ul id="source-list" class="source-list" aria-label="Selected PGN source files">
+                  <li class="empty-state">No input files selected yet.</li>
+                </ul>
+              </details>
+            </section>
+
+            <section class="panel" aria-labelledby="output-heading">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">2. Output</p>
+                  <h2 id="output-heading">Where should results go?</h2>
+                </div>
+              </div>
+              <p class="help">Choose one output PGN file for merged, filtered, or cleaned games. Leave it blank to keep the result in the run log.</p>
+
+              <label class="check-control validation-control">
+                <input id="validation-only" type="checkbox" />
+                <span>Check PGN errors only (does not create an output file)</span>
+              </label>
+
+              <div class="field-row output-path-row">
+                <div class="field grow">
+                  <label for="output-path">Output file <span class="optional">optional</span></label>
+                  <input id="output-path" type="text" autocomplete="off" placeholder="C:\\Games\\filtered.pgn" />
+                </div>
+                <button id="browse-output" class="secondary align-end" type="button">Choose…</button>
+              </div>
+
+              <div class="check-grid compact-checks">
+                <label class="check-control">
+                  <input id="append-output" type="checkbox" />
+                  <span>Append to an existing output file</span>
+                </label>
+                <label class="check-control">
+                  <input id="overwrite-output" type="checkbox" />
+                  <span>Overwrite the output file if it exists</span>
+                </label>
+              </div>
+              <p class="field-note warning-note">Existing files are never overwritten unless you explicitly select Overwrite or Append.</p>
+
+              <fieldset class="subsection">
+                <legend>Split output instead</legend>
+                <div class="form-grid split-game-grid">
+                  <div class="field">
+                    <label for="split-games">Games per output file <span class="optional">optional</span></label>
+                    <input id="split-games" type="number" min="1" step="1" inputmode="numeric" placeholder="e.g. 250" />
+                  </div>
+                  <div class="field">
+                    <label for="split-output-dir">Split-output folder</label>
+                    <div class="field-row">
+                      <input id="split-output-dir" type="text" autocomplete="off" placeholder="C:\\Games\\split-output" />
+                      <button id="browse-split-output" class="secondary" type="button">Choose…</button>
+                    </div>
+                  </div>
+                </div>
+                <p class="field-note">Use this instead of a single output file. Files are named <code>1.pgn</code>, <code>2.pgn</code>, and so on in the chosen folder.</p>
+              </fieldset>
+
+            </section>
+
+            <section class="panel" aria-labelledby="filters-heading">
+              <div class="panel-heading collapsible-heading">
+                <div>
+                  <p class="eyebrow">3. Select games</p>
+                  <h2 id="filters-heading">Common filters</h2>
+                </div>
+                <button class="disclosure" type="button" data-disclosure="filters-content" aria-expanded="true">Hide</button>
+              </div>
+
+              <div id="filters-content" class="panel-content">
+                <p class="help">Leave a field blank to ignore it. Text values use the matching behavior supported by <code>pgn-extract</code>.</p>
+                <div class="form-grid metadata-grid">
+                  <div class="field">
+                    <label for="filter-player">Player</label>
+                    <input id="filter-player" type="text" placeholder="Either color" />
+                  </div>
+                  <div class="field">
+                    <label for="filter-event">Event</label>
+                    <input id="filter-event" type="text" placeholder="e.g. Candidates" />
+                  </div>
+                  <div class="field">
+                    <label for="filter-site">Site</label>
+                    <input id="filter-site" type="text" placeholder="e.g. London" />
+                  </div>
+                  <div class="field">
+                    <label for="filter-date">Date / year</label>
+                    <input id="filter-date" type="text" placeholder="YYYY or YYYY.MM.DD" />
+                  </div>
+                  <div class="field">
+                    <label for="filter-date-from">Date from</label>
+                    <input id="filter-date-from" type="text" placeholder="YYYY or YYYY.MM.DD" />
+                  </div>
+                  <div class="field">
+                    <label for="filter-date-to">Date through</label>
+                    <input id="filter-date-to" type="text" placeholder="YYYY or YYYY.MM.DD" />
+                  </div>
+                  <div class="field">
+                    <label for="filter-round">Round</label>
+                    <input id="filter-round" type="text" placeholder="e.g. 7" />
+                  </div>
+                  <div class="field">
+                    <label for="filter-white">White</label>
+                    <input id="filter-white" type="text" placeholder="Player name" />
+                  </div>
+                  <div class="field">
+                    <label for="filter-black">Black</label>
+                    <input id="filter-black" type="text" placeholder="Player name" />
+                  </div>
+                  <div class="field">
+                    <label for="filter-result">Result</label>
+                    <select id="filter-result">
+                      <option value="">Any result</option>
+                      <option value="1-0">White won (1–0)</option>
+                      <option value="0-1">Black won (0–1)</option>
+                      <option value="1/2-1/2">Draw (½–½)</option>
+                      <option value="*">Unfinished (*)</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="filter-eco">ECO code</label>
+                    <input id="filter-eco" type="text" placeholder="e.g. C42" />
+                  </div>
+                  <div class="field">
+                    <label for="filter-minimum-elo">Minimum Elo</label>
+                    <input id="filter-minimum-elo" type="number" min="0" step="1" inputmode="numeric" placeholder="e.g. 2200" />
+                  </div>
+                  <div class="field">
+                    <label for="filter-maximum-elo">Maximum Elo</label>
+                    <input id="filter-maximum-elo" type="number" min="0" step="1" inputmode="numeric" placeholder="e.g. 2800" />
+                  </div>
+                </div>
+
+                <p class="field-note">Elo matches either player's rating. Use Date / year by itself, or use Date from and Date through as a range.</p>
+
+                <fieldset class="subsection">
+                  <legend>Specific games or ranges</legend>
+                  <div class="field">
+                    <input id="filter-selected-games" type="text" aria-label="Specific games or ranges" placeholder="e.g. 1:10,15,89:94" />
+                  </div>
+                  <p class="field-note">Use commas and colon ranges. Numbers refer to games that match the selected filters.</p>
+                </fieldset>
+
+                <fieldset class="subsection">
+                  <legend>Processing range and length</legend>
+                  <div class="form-grid four-up">
+                    <div class="field">
+                      <label for="filter-first-game">Start at Game</label>
+                      <input id="filter-first-game" type="number" min="1" step="1" inputmode="numeric" placeholder="1" />
+                    </div>
+                    <div class="field">
+                      <label for="filter-last-game">End with Game</label>
+                      <input id="filter-last-game" type="number" min="1" step="1" inputmode="numeric" placeholder="Last" />
+                    </div>
+                    <div class="field">
+                      <label for="filter-min-plies">Minimum plies</label>
+                      <input id="filter-min-plies" type="number" min="0" step="1" inputmode="numeric" placeholder="0" />
+                    </div>
+                    <div class="field">
+                      <label for="filter-max-plies">Maximum plies</label>
+                      <input id="filter-max-plies" type="number" min="0" step="1" inputmode="numeric" placeholder="No limit" />
+                    </div>
+                  </div>
+                </fieldset>
+
+                <fieldset class="subsection">
+                  <legend>Game endings</legend>
+                  <div class="check-grid">
+                    <label class="check-control"><input id="filter-checkmate" type="checkbox" /><span>Checkmate only</span></label>
+                    <label class="check-control"><input id="filter-stalemate" type="checkbox" /><span>Stalemate only</span></label>
+                    <label class="check-control"><input id="filter-repetition" type="checkbox" /><span>Threefold repetition</span></label>
+                    <label class="check-control"><input id="filter-setup" type="checkbox" /><span>Games with a setup position</span></label>
+                  </div>
+                </fieldset>
+              </div>
+            </section>
+
+            <section class="panel" aria-labelledby="format-heading">
+              <div class="panel-heading collapsible-heading">
+                <div>
+                  <h2 id="format-heading">Output options</h2>
+                </div>
+                <button class="disclosure" type="button" data-disclosure="format-content" aria-expanded="true">Hide</button>
+              </div>
+
+              <div id="format-content" class="panel-content">
+                <div class="form-grid format-grid">
+                  <div class="field">
+                    <label for="variation-mode">Variations</label>
+                    <select id="variation-mode">
+                      <option value="keep">Keep all variations</option>
+                      <option value="mainline">Main line only</option>
+                      <option value="remove">Remove variations</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="line-width">Line width</label>
+                    <input id="line-width" type="number" min="20" step="1" inputmode="numeric" placeholder="Default" />
+                  </div>
+                </div>
+
+                <div class="check-grid">
+                  <label class="check-control"><input id="remove-duplicates" type="checkbox" /><span>Remove duplicate games</span></label>
+                  <label class="check-control"><input id="include-tags" type="checkbox" checked /><span>Include tag pairs</span></label>
+                  <label class="check-control"><input id="remove-comments" type="checkbox" /><span>Remove comments</span></label>
+                  <label class="check-control"><input id="remove-nags" type="checkbox" /><span>Remove NAGs</span></label>
+                  <label class="check-control"><input id="include-fen-comments" type="checkbox" /><span>Include FEN comments</span></label>
+                  <label class="check-control"><input id="classify-eco" type="checkbox" /><span>Add/use ECO classification</span></label>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <aside class="activity-column" aria-label="Run activity">
+            <section class="panel preset-panel" aria-labelledby="presets-heading">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Reusable settings</p>
+                  <h2 id="presets-heading">Presets</h2>
+                </div>
+              </div>
+              <div class="preset-save">
+                <label class="sr-only" for="preset-name">Preset name</label>
+                <input id="preset-name" type="text" maxlength="80" placeholder="Preset name" />
+                <button id="save-preset" class="secondary" type="button">Save</button>
+              </div>
+              <div id="preset-list" class="preset-list" aria-live="polite">
+                <p class="empty-state">No saved presets.</p>
+              </div>
+              <div class="preset-actions">
+                <button id="clear-presets" class="danger secondary" type="button" disabled>Clear All Presets</button>
+              </div>
+            </section>
+
+            <section class="panel run-controls-panel" aria-label="Run controls">
+              <div class="run-actions">
+                <button id="run-command" class="primary" type="submit">Run pgn-extract</button>
+                <button id="cancel-run" class="danger secondary" type="button" disabled>Cancel run</button>
+              </div>
+            </section>
+
+            <section class="panel run-panel" aria-labelledby="run-heading">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Execution</p>
+                  <h2 id="run-heading">Run report</h2>
+                </div>
+                <span id="run-status" class="run-status idle">Idle</span>
+              </div>
+
+              <div id="run-meta" class="run-meta" aria-live="polite">No run yet.</div>
+              <div id="run-outputs" class="run-outputs hidden"></div>
+              <div id="command-errors" class="message-list errors hidden" aria-live="assertive"></div>
+              <div id="command-warnings" class="message-list warnings hidden" aria-live="polite"></div>
+              <details id="command-details" class="log-details" open>
+                <summary>Command used</summary>
+                <pre id="command-preview" class="run-log command-preview">No command run yet.</pre>
+              </details>
+              <details id="stdout-details" class="log-details" open>
+                <summary>Standard output</summary>
+                <pre id="run-stdout" class="run-log">No run output yet.</pre>
+              </details>
+              <details id="stderr-details" class="log-details">
+                <summary>Standard error</summary>
+                <pre id="run-stderr" class="run-log">No errors yet.</pre>
+              </details>
+            </section>
+          </aside>
+        </div>
+      </form>
+    </main>
+
+    <template id="source-item-template">
+      <li class="source-item">
+        <code class="source-item-path"></code>
+        <button class="remove-source" type="button" aria-label="Remove source">Remove</button>
+      </li>
+    </template>
+
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>

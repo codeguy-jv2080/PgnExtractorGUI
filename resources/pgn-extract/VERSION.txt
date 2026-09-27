@@ -1,0 +1,14 @@
+pgn-extract runtime target: 26-06
+Read-only local source reference: commit e69e863 (v26-06)
+
+Expected executable:
+  bin\pgn-extract.exe
+
+Build provenance:
+  Built from the read-only local source reference with MinGW-w64 (64-bit Windows).
+  The executable is statically linked apart from Windows system libraries.
+  Non-runtime DWARF debug sections are stripped from the release copy.
+  SHA-256: 0B55E809856B53D574EBE0C69C2449944E652DFD64C5F92E302EB2B3126FD785
+
+This file records the intended upstream target and the bundled build identity; it
+does not replace independent verification of the executable where that is required.

@@ -1,0 +1,29 @@
+# Python environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Packaging output
+build/
+dist/
+*.egg-info/
+
+# Local runtime artifacts
+*.log
+*.sqlite
+*.sqlite3
+*.db
+
+# Editor and Windows metadata
+.idea/
+.vscode/
+Thumbs.db
+Desktop.ini

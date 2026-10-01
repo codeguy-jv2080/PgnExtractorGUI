@@ -9,6 +9,18 @@ cloud service or transmit PGN files.
 The GUI code lives entirely in this repository. The separate local pgn-extract
 repository is a read-only reference and must not be modified by this project.
 
+## Download the Windows app
+
+[Download PgnExtractorGUI for Windows x64](https://github.com/codeguy-jv2080/PgnExtractorGUI/releases/download/v0.1.0/PgnExtractorGUI-v0.1.0-windows-x64.zip).
+
+Choose **Extract All**, open the extracted `PgnExtractorGUI` folder, and run
+**PgnExtractorGUI.exe**. Keep its `_internal` folder and the other supplied files
+together. The download includes Python and the pgn-extract backend; no development
+setup is required.
+
+The repository's **Code > Download ZIP** and release **Source code** links contain
+the source project. Use the Windows app download above to run the packaged program.
+
 ## Architecture
 
 - A Python FastAPI backend serves the local application UI and runs the bundled
